@@ -1,0 +1,47 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+##########################################
+# Though under //zircon, this build file #
+# is meant to be used in the Fuchsia GN  #
+# build.                                 #
+# See fxb/36139.                         #
+##########################################
+
+assert(!defined(zx) || zx != "/",
+       "This file can only be used in the Fuchsia GN build.")
+
+import("//build/unification/images/migrated_manifest.gni")
+
+executable("sysinfo") {
+  if (is_fuchsia) {
+    configs += [ "//build/unification/config:zircon-migrated" ]
+  }
+  if (is_fuchsia) {
+    fdio_config = [ "//build/config/fuchsia:fdio_config" ]
+    if (configs + fdio_config - fdio_config != configs) {
+      configs -= fdio_config
+    }
+  }
+  output_dir = "$root_out_dir/zircon-migrated"
+  sources = [
+    "main.cc",
+    "sysinfo.cc",
+  ]
+  deps = [
+    "//sdk/fidl/fuchsia.boot:fuchsia.boot_llcpp",
+    "//sdk/fidl/fuchsia.sysinfo:fuchsia.sysinfo_llcpp",
+    "//src/sys/lib/stdout-to-debuglog/cpp",
+    "//zircon/public/lib/async-loop-cpp",
+    "//zircon/public/lib/fdio",
+    "//zircon/public/lib/fidl-async-cpp",
+    "//zircon/system/ulib/ddk",
+    "//zircon/system/ulib/fs",
+    "//zircon/system/ulib/svc",
+  ]
+}
+
+migrated_manifest("sysinfo-manifest") {
+  deps = [ ":sysinfo" ]
+}

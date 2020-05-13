@@ -1,0 +1,66 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+##########################################
+# Though under //zircon, this build file #
+# is meant to be used in the Fuchsia GN  #
+# build.                                 #
+# See fxb/36548.                         #
+##########################################
+
+assert(!defined(zx) || zx != "/",
+       "This file can only be used in the Fuchsia GN build.")
+
+import("//build/unification/zx_library.gni")
+
+zx_library("paver") {
+  sdk = "source"
+  sdk_headers = [ "lib/paver/provider.h" ]
+  sources = [
+    "abr-client.cc",
+    "abr.cc",
+    "device-partitioner.cc",
+    "fvm.cc",
+    "partition-client.cc",
+    "paver.cc",
+    "provider.cc",
+    "stream-reader.cc",
+    "validation.cc",
+  ]
+  deps = [
+    "//sdk/fidl/fuchsia.boot:fuchsia.boot_llcpp",
+    "//sdk/fidl/fuchsia.hardware.block:fuchsia.hardware.block_llcpp",
+    "//sdk/fidl/fuchsia.hardware.block.encrypted:fuchsia.hardware.block.encrypted_llcpp",
+    "//sdk/fidl/fuchsia.hardware.block.partition:fuchsia.hardware.block.partition_llcpp",
+    "//sdk/fidl/fuchsia.hardware.block.volume:fuchsia.hardware.block.volume_llcpp",
+    "//sdk/fidl/fuchsia.hardware.skipblock:fuchsia.hardware.skipblock_llcpp",
+    "//sdk/fidl/fuchsia.paver:fuchsia.paver_llcpp",
+    "//sdk/fidl/fuchsia.sysinfo:fuchsia.sysinfo_llcpp",
+    "//src/devices/lib/amlogic",
+    "//zircon/public/lib/cksum",
+    "//zircon/public/lib/digest",
+    "//zircon/public/lib/fbl",
+    "//zircon/public/lib/fdio",
+    "//zircon/public/lib/fidl",
+    "//zircon/public/lib/fidl-async-cpp",
+    "//zircon/public/lib/fzl",
+    "//zircon/public/lib/sync",
+    "//zircon/public/lib/zx",
+    "//zircon/system/fidl/fuchsia-device:llcpp",
+    "//zircon/system/ulib/block-client",
+    "//zircon/system/ulib/chromeos-disk-setup",
+    "//zircon/system/ulib/ddk",
+    "//zircon/system/ulib/fdio-caller",
+    "//zircon/system/ulib/fs",
+    "//zircon/system/ulib/fs-management",
+    "//zircon/system/ulib/fvm",
+    "//zircon/system/ulib/gpt",
+    "//zircon/system/ulib/libabr",
+    "//zircon/system/ulib/ramdevice-client:ramdevice-client-static",
+    "//zircon/system/ulib/svc",
+    "//zircon/system/ulib/sysconfig-client:sysconfig-sync-client",
+    "//zircon/system/ulib/zxcrypt:zxcrypt-fdio",
+  ]
+  public_deps = [ "//zircon/system/ulib/svc" ]
+}

@@ -1,0 +1,24 @@
+// Copyright 2019 The Fuchsia Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+// This API is deprecated. Use https://cs.corp.google.com/fuchsia/fuchsia-mirror/sdk/fidl/fuchsia.hardware.power.statecontrol/admin.fidl
+// instead.Bug:fxb/42257
+library fuchsia.device.manager;
+
+using zx;
+/// All available suspend flags
+const uint32 SUSPEND_FLAG_REBOOT = 0xdcdc0100;
+const uint32 SUSPEND_FLAG_REBOOT_BOOTLOADER = 0xdcdc0101;
+const uint32 SUSPEND_FLAG_REBOOT_RECOVERY = 0xdcdc0102;
+const uint32 SUSPEND_FLAG_POWEROFF = 0xdcdc0200;
+const uint32 SUSPEND_FLAG_MEXEC = 0xdcdc0300;
+const uint32 SUSPEND_FLAG_SUSPEND_RAM = 0xdcdc0400;
+
+/// Provides administration services for the device manager service and the device tree it controls.
+[Discoverable, Layout = "Simple"]
+protocol Administrator {
+    /// Ask all devices to enter the suspend state indicated by `flags`. Flags should be some
+    /// combination of `DEVICE_SUSPEND_FLAG_*` from the DDK.
+    Suspend(uint32 flags) -> (zx.status status);
+};

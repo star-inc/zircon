@@ -1,0 +1,92 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+##########################################
+# Though under //zircon, this build file #
+# is meant to be used in the Fuchsia GN  #
+# build.                                 #
+# See fxb/36548.                         #
+##########################################
+
+assert(!defined(zx) || zx != "/",
+       "This file can only be used in the Fuchsia GN build.")
+
+import("//build/unification/zx_library.gni")
+
+zx_library("zxcrypt-dev") {
+  static = true
+  sdk = "source"
+  sdk_headers = [
+    "zxcrypt/ddk-volume.h",
+    "zxcrypt/volume.h",
+  ]
+  sources = [
+    "ddk-volume.cc",
+    "volume.cc",
+  ]
+
+  public_deps = [
+    # <zxcrypt/volume.h> has #include <crypto/aead.h> (among others).
+    "//zircon/system/ulib/zircon-crypto:zircon-crypto-static",
+
+    # <zxcrypt/ddk-volume.h> has #include <ddk/device.h>.
+    "//zircon/system/ulib/ddk",
+  ]
+
+  configs += [ "//build/config/fuchsia:integer-paranoia" ]
+
+  # To minimize the set of libraries that we depend on that need to be loaded
+  # from /boot/lib in early boot, we statically link most of our dependencies.
+  deps = [
+    "//sdk/banjo/ddk.protocol.block",
+    "//sdk/banjo/ddk.protocol.block.volume",
+    "//zircon/public/lib/boringssl",
+    "//zircon/public/lib/fbl",
+    "//zircon/public/lib/sync",
+    "//zircon/public/lib/zircon-internal",
+    "//zircon/public/lib/zx",
+    "//zircon/system/ulib/ddk",
+  ]
+  configs += [ "//build/config/fuchsia:static_cpp_standard_library" ]
+}
+
+zx_library("zxcrypt-fdio") {
+  shared = true
+
+  # TODO(36548): turn to shared library after migration to GN build.
+  sdk = "source"
+  sdk_headers = [
+    "zxcrypt/fdio-volume.h",
+    "zxcrypt/volume.h",
+  ]
+  sources = [
+    "fdio-volume.cc",
+    "volume.cc",
+  ]
+  public_deps = [
+    # <zxcrypt/fdio-volume.h> has #include <lib/fdio/cpp/caller.h>
+    "//zircon/system/ulib/fdio-caller",
+
+    # <zxcrypt/volume.h> has #include <crypto/aead.h> (among others).
+    "//zircon/system/ulib/zircon-crypto",
+  ]
+  configs += [ "//build/config/fuchsia:integer-paranoia" ]
+  deps = [
+    "//sdk/fidl/fuchsia.hardware.block:fuchsia.hardware.block_c",
+    "//sdk/fidl/fuchsia.hardware.block.encrypted:fuchsia.hardware.block.encrypted_c",
+    "//sdk/fidl/fuchsia.hardware.block.volume:fuchsia.hardware.block.volume_c",
+    "//zircon/public/lib/boringssl",
+    "//zircon/public/lib/fbl",
+    "//zircon/public/lib/fdio",
+    "//zircon/public/lib/fzl",
+    "//zircon/public/lib/sync",
+    "//zircon/public/lib/zircon-internal",
+    "//zircon/public/lib/zx",
+    "//zircon/system/fidl/fuchsia-device:llcpp",
+    "//zircon/system/ulib/fdio-caller",
+    "//zircon/system/ulib/kms-stateless",
+    "//zircon/system/ulib/ramdevice-client:ramdevice-client-static",
+  ]
+  configs += [ "//build/config/fuchsia:static_cpp_standard_library" ]
+}
